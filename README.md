@@ -1,0 +1,2 @@
+# spookyswap-chefv2
+mcv2: 0x7bC91039C93477515c777e9367Ae49738CC243d0
