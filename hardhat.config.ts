@@ -15,7 +15,7 @@ const MASTER_PID = 25
 const MCV1 = "0x0d6995072186C54AaCea93f112B86C125B6Ee6F3"
 const MCV2 = "0xFfDCb4e461130889908444221a8714bbF04D18cA"
 
-task("addpool", "Adds pool to MCv2").addParam("allocPoint", "Amount of points to allocate to the new pool", undefined, types.int).addParam("lpToken", "Address of the LP tokens for the farm").addOptionalParam("update", "true if massUpdateAllPools should be called", false, types.axolean).addParam("sleep", "Time in seconds to sleep between adding and setting up the pool", undefined, types.int).setAction(async (taskArgs, hre) => {
+task("addpool", "Adds pool to MCv2").addParam("allocPoint", "Amount of points to allocate to the new pool", undefined, types.int).addParam("lpToken", "Address of the LP tokens for the farm").addOptionalParam("update", "true if massUpdateAllPools should be called", false, types.boolean).addParam("sleep", "Time in seconds to sleep between adding and setting up the pool", undefined, types.int).setAction(async (taskArgs, hre) => {
     const wait = (milliseconds) => {
       return new Promise(resolve => setTimeout(resolve, milliseconds))
     }

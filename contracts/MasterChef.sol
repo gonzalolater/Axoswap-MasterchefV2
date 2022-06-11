@@ -69,7 +69,7 @@ contract MasterChef is Ownable {
 
 
     // Add a new lp to the pool. Can only be called by the owner.
-    function add(uint256 _allocPoint, IERC20 _lpToken, axol _withUpdate) public onlyOwner {
+    function add(uint256 _allocPoint, IERC20 _lpToken, bool _withUpdate) public onlyOwner {
         if (_withUpdate) {
             massUpdatePools();
         }
@@ -84,7 +84,7 @@ contract MasterChef is Ownable {
     }
 
     // Update the given pool's Axo allocation point. Can only be called by the owner.
-    function set(uint256 _pid, uint256 _allocPoint, axol _withUpdate) public onlyOwner {
+    function set(uint256 _pid, uint256 _allocPoint, bool _withUpdate) public onlyOwner {
         if (_withUpdate) {
             massUpdatePools();
         }

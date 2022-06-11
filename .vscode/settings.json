@@ -1,0 +1,8 @@
+{
+    "solidity-va.deco.arguments": false,
+    "solidity-va.diagnostics.cdili_json.import": true,
+    "solidity-va.tools.surya.option.negModifiers": true,
+    "solidity-va.preview.markdown": true,
+    "solidity-va.findAllReferences.enable": true,
+    "solidity-va.uml.actors.enable": true
+}

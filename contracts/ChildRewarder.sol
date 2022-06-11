@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.10;
+pragma solidity ^0.8.0;
 
 import "./interfaces/IRewarder.sol";
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
@@ -8,14 +8,19 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import "./MasterChefV2.sol";
 
+interface IRewarderExt is IRewarder {
+    function pendingToken(uint _pid, address _user) external view returns (uint pending);
+    function rewardToken() external view returns (IERC20);
+}
+
 interface IERC20Ext is IERC20 {
     function decimals() external returns (uint);
 }
 
-contract ComplexRewarder is IRewarder, Ownable, ReentrancyGuard {
+contract ChildRewarder is IRewarder, Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    IERC20 public immutable rewardToken;
+    IERC20 public rewardToken;
 
     /// @notice Info of each MCV2 user.
     /// `amount` LP token amount the user has provided.
@@ -44,38 +49,46 @@ contract ComplexRewarder is IRewarder, Ownable, ReentrancyGuard {
     /// @dev Total allocation points. Must be the sum of all allocation points in all pools.
     uint totalAllocPoint;
 
-    uint public rewardPerSecond;
-    uint public immutable ACC_TOKEN_PRECISION;
+    uint public rewardPerblock;
+    uint public ACC_TOKEN_PRECISION;
 
-    address private immutable MASTERCHEF_V2;
+    address private MASTERCHEF_V2;
+
+    address private PARENT;
+
+    bool notinit = true;
 
     event LogOnReward(address indexed user, uint indexed pid, uint amount, address indexed to);
     event LogPoolAddition(uint indexed pid, uint allocPoint);
     event LogSetPool(uint indexed pid, uint allocPoint);
     event LogUpdatePool(uint indexed pid, uint lastRewardTime, uint lpSupply, uint accRewardPerShare);
-    event LogRewardPerSecond(uint rewardPerSecond);
+    event LogRewardPerblock(uint rewardPerblock);
     event AdminTokenRecovery(address _tokenAddress, uint _amt, address _adr);
     event LogInit();
 
-    modifier onlyMCV2 {
-        require(
-            msg.sender == MASTERCHEF_V2,
-            "Only MCV2 can call this function."
-        );
+    modifier onlyParent {
+        require(msg.sender == PARENT, "Only PARENT can call this function.");
         _;
     }
 
-    constructor (IERC20Ext _rewardToken, uint _rewardPerSecond, address _MASTERCHEF_V2) {
+    constructor () {} //use init()
+
+    function init(IERC20Ext _rewardToken, uint _rewardPerblock, address _MASTERCHEF_V2, address _PARENT) external {
+        require(notinit);
+
         uint decimalsRewardToken = _rewardToken.decimals();
         require(decimalsRewardToken < 30, "Token has way too many decimals");
         ACC_TOKEN_PRECISION = 10**(30 - decimalsRewardToken);
         rewardToken = _rewardToken;
-        rewardPerSecond = _rewardPerSecond;
+        rewardPerblock = _rewardPerblock;
         MASTERCHEF_V2 = _MASTERCHEF_V2;
+        PARENT = _PARENT;
+
+        notinit = false;
     }
 
 
-    function onReward (uint _pid, address _user, address _to, uint, uint _amt) onlyMCV2 nonReentrant override external {
+    function onReward (uint _pid, address _user, address _to, uint, uint _amt) onlyParent nonReentrant override external {
         PoolInfo memory pool = updatePool(_pid);
         UserInfo storage user = userInfo[_pid][_user];
         uint pending;
@@ -87,7 +100,7 @@ contract ComplexRewarder is IRewarder, Ownable, ReentrancyGuard {
         user.rewardDebt = _amt * pool.accRewardPerShare / ACC_TOKEN_PRECISION;
         emit LogOnReward(_user, _pid, pending, _to);
     }
-    
+
     function pendingTokens(uint pid, address user, uint) override external view returns (IERC20[] memory rewardTokens, uint[] memory rewardAmounts) {
         IERC20[] memory _rewardTokens = new IERC20[](1);
         _rewardTokens[0] = (rewardToken);
@@ -96,11 +109,11 @@ contract ComplexRewarder is IRewarder, Ownable, ReentrancyGuard {
         return (_rewardTokens, _rewardAmounts);
     }
 
-    /// @notice Sets the reward per second to be distributed. Can only be called by the owner.
-    /// @param _rewardPerSecond The amount of token to be distributed per second.
-    function setRewardPerSecond(uint _rewardPerSecond) public onlyOwner {
-        rewardPerSecond = _rewardPerSecond;
-        emit LogRewardPerSecond(_rewardPerSecond);
+    /// @notice Sets the reward per block to be distributed. Can only be called by the owner.
+    /// @param _rewardPerblock The amount of token to be distributed per block.
+    function setRewardPerblock(uint _rewardPerblock) public onlyOwner {
+        rewardPerblock = _rewardPerblock;
+        emit LogRewardPerblock(_rewardPerblock);
     }
 
 
@@ -153,7 +166,7 @@ contract ComplexRewarder is IRewarder, Ownable, ReentrancyGuard {
 
         if (block.timestamp > pool.lastRewardTime && lpSupply != 0) {
             uint time = block.timestamp - pool.lastRewardTime;
-            uint reward = totalAllocPoint == 0 ? 0 : (time * rewardPerSecond * pool.allocPoint / totalAllocPoint);
+            uint reward = totalAllocPoint == 0 ? 0 : (time * rewardPerblock * pool.allocPoint / totalAllocPoint);
             accRewardPerShare = accRewardPerShare + (reward * ACC_TOKEN_PRECISION / lpSupply);
         }
         pending = (user.amount * accRewardPerShare / ACC_TOKEN_PRECISION) - user.rewardDebt;
@@ -177,7 +190,7 @@ contract ComplexRewarder is IRewarder, Ownable, ReentrancyGuard {
 
             if (lpSupply > 0) {
                 uint time = block.timestamp - pool.lastRewardTime;
-                uint reward = totalAllocPoint == 0 ? 0 : (time * rewardPerSecond * pool.allocPoint / totalAllocPoint);
+                uint reward = totalAllocPoint == 0 ? 0 : (time * rewardPerblock * pool.allocPoint / totalAllocPoint);
                 pool.accRewardPerShare = pool.accRewardPerShare + uint128(reward * ACC_TOKEN_PRECISION / lpSupply);
             }
             pool.lastRewardTime = uint64(block.timestamp);
@@ -186,7 +199,7 @@ contract ComplexRewarder is IRewarder, Ownable, ReentrancyGuard {
         }
     }
 
-    function recoverTokens(address _tokenAddress, uint _amt, address _adr) external onlyOwner {        
+    function recoverTokens(address _tokenAddress, uint _amt, address _adr) external onlyOwner {
         IERC20(_tokenAddress).safeTransfer(_adr, _amt);
 
         emit AdminTokenRecovery(_tokenAddress, _amt, _adr);

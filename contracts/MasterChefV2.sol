@@ -37,7 +37,7 @@ contract MasterChefV2 is Ownable {
     /// @notice Amount of pool infos and their respective lpToken entries I.E stores last ID + 1, for above two mappings
     uint public poolInfoAmount;
     /// @notice Is an address contained in the above `lpToken` array
-    mapping(address => axol) public isLpToken;
+    mapping(address => bool) public isLpToken;
     /// @notice Address of each `IRewarder` contract in MCV2.
     mapping(uint => IRewarder) public rewarder;
 
@@ -57,8 +57,8 @@ contract MasterChefV2 is Ownable {
     event Withdraw(address indexed user, uint indexed pid, uint amount, address indexed to);
     event EmergencyWithdraw(address indexed user, uint indexed pid, uint amount, address indexed to);
     event Harvest(address indexed user, uint indexed pid, uint amount);
-    event LogPoolAddition(uint indexed pid, uint allocPoint, IERC20 indexed lpToken, IRewarder rewarder, axol update);
-    event LogSetPool(uint indexed pid, uint allocPoint, IRewarder rewarder, axol overwrite, axol update);
+    event LogPoolAddition(uint indexed pid, uint allocPoint, IERC20 indexed lpToken, IRewarder rewarder, bool update);
+    event LogSetPool(uint indexed pid, uint allocPoint, IRewarder rewarder, bool overwrite, bool update);
     event LogUpdatePool(uint indexed pid, uint lastRewardBlock, uint lpSupply, uint accAxoPerShare);
     event LogInit();
 
@@ -350,7 +350,7 @@ contract MasterChefV2 is Ownable {
     /// @param allocPoint AP of the new pool.
     /// @param _lpToken Address of the LP ERC-20 token.
     /// @param _rewarder Addresses of the rewarder delegate(s).
-    function add(uint64 allocPoint, IERC20 _lpToken, IRewarder _rewarder, axol update) external onlyOwner {
+    function add(uint64 allocPoint, IERC20 _lpToken, IRewarder _rewarder, bool update) external onlyOwner {
         checkForDuplicate(_lpToken);
         
         if (update) {
@@ -379,7 +379,7 @@ contract MasterChefV2 is Ownable {
     /// @param _allocPoint New AP of the pool.
     /// @param _rewarder Addresses of the rewarder delegates.
     /// @param overwrite True if _rewarders should be `set`. Otherwise `_rewarders` is ignored.
-    function set(uint _pid, uint64 _allocPoint, IRewarder _rewarder, axol overwrite, axol update) external onlyOwner {
+    function set(uint _pid, uint64 _allocPoint, IRewarder _rewarder, bool overwrite, bool update) external onlyOwner {
         _set(_pid, _allocPoint, _rewarder, overwrite, update);
     }
 
@@ -388,7 +388,7 @@ contract MasterChefV2 is Ownable {
     /// @param _allocPoint New AP of the pool.
     /// @param _rewarders Addresses of the rewarder delegates.
     /// @param overwrite True if _rewarders should be `set`. Otherwise `_rewarders` is ignored.
-    function setBatch(uint[] memory _pid, uint64[] memory _allocPoint, IRewarder[] memory _rewarders, axol[] memory overwrite, axol update) external onlyOwner {
+    function setBatch(uint[] memory _pid, uint64[] memory _allocPoint, IRewarder[] memory _rewarders, bool[] memory overwrite, bool update) external onlyOwner {
         require(_pid.length == _allocPoint.length && _allocPoint.length == _rewarders.length && _rewarders.length == overwrite.length, "MCV2: all arrays need to be the same length");
 
         if(update)
@@ -399,7 +399,7 @@ contract MasterChefV2 is Ownable {
             _set(_pid[i], _allocPoint[i], _rewarders[i], overwrite[i], false);
     }
 
-    function _set(uint _pid, uint64 _allocPoint, IRewarder _rewarder, axol overwrite, axol update) internal validatePid(_pid) {
+    function _set(uint _pid, uint64 _allocPoint, IRewarder _rewarder, bool overwrite, bool update) internal validatePid(_pid) {
         if (update) {
             massUpdateAllPools();
         }
@@ -411,7 +411,7 @@ contract MasterChefV2 is Ownable {
         emit LogSetPool(_pid, _allocPoint, overwrite ? _rewarder : rewarder[_pid], overwrite, update);
     }
 
-    function setV1HarvestQueryBlock(uint256 newBlock, axol inDays) external onlyOwner {
+    function setV1HarvestQueryBlock(uint256 newBlock, bool inDays) external onlyOwner {
         V1_HARVEST_QUERY_TIME = newBlock * (inDays ? 1 days : 1);
     }
 
