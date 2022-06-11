@@ -57,18 +57,19 @@ task("addpool", "Adds pool to MCv2").addParam("allocPoint", "Amount of points to
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
 
-  for (const account of accounts) {
-    console.log(account.address);
+const getAccounts = (network: string) => {
+  const accounts = {
+    polygon: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    stagenet: process.env.STAGENET_PRIVATE_KEY ? [process.env.STAGENET_PRIVATE_KEY] : [],
+  };
+
+  if (!accounts[network]) {
+    throw new Error(`Your account environment variables for ${network} are not set`);
   }
-});
 
-const accounts = {
-  mnemonic: process.env.MNEMONIC || "test test test test test test test test test test test junk",
-}
-
+  return accounts[network];
+};
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -81,21 +82,9 @@ const config: HardhatUserConfig = {
     apiKey: process.env.API_KEY
   },
   networks: {
-    hardhat: {
-      accounts,
-      /*forking: {
-        url: "process.env.INFURA_URL",
-        blockNumber: 34725366,
-      },*/
-      chainId: 137,
-    },
-    localhost: {
-      accounts,
-      gasPrice: 20000000000,
-    },
     polygon: {
-      url: "process.env.INFURA_URL",
-      accounts,
+      url: "",
+      accounts: getAccounts("polygon"),
       chainId: 137,
       gasPrice: 45000000000,
     },

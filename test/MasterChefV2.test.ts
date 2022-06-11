@@ -8,7 +8,7 @@ describe("MasterChefV2", function () {
   })
 
   beforeEach(async function () {
-    await deploy(this, [["Axo", this.SpookyToken]])
+    await deploy(this, [["Axo", this.AxoToken]])
 
     await deploy(this, [
       ["lp", this.ERC20Mock, ["LP Token", "LPT", getBigNumber(10)]],

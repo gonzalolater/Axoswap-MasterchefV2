@@ -49,7 +49,7 @@ contract ChildRewarder is IRewarder, Ownable, ReentrancyGuard {
     /// @dev Total allocation points. Must be the sum of all allocation points in all pools.
     uint totalAllocPoint;
 
-    uint public rewardPerblock;
+    uint public rewardPerBlock;
     uint public ACC_TOKEN_PRECISION;
 
     address private MASTERCHEF_V2;
@@ -62,7 +62,7 @@ contract ChildRewarder is IRewarder, Ownable, ReentrancyGuard {
     event LogPoolAddition(uint indexed pid, uint allocPoint);
     event LogSetPool(uint indexed pid, uint allocPoint);
     event LogUpdatePool(uint indexed pid, uint lastRewardTime, uint lpSupply, uint accRewardPerShare);
-    event LogRewardPerblock(uint rewardPerblock);
+    event LogRewardPerblock(uint rewardPerBlock);
     event AdminTokenRecovery(address _tokenAddress, uint _amt, address _adr);
     event LogInit();
 
@@ -80,7 +80,7 @@ contract ChildRewarder is IRewarder, Ownable, ReentrancyGuard {
         require(decimalsRewardToken < 30, "Token has way too many decimals");
         ACC_TOKEN_PRECISION = 10**(30 - decimalsRewardToken);
         rewardToken = _rewardToken;
-        rewardPerblock = _rewardPerblock;
+        rewardPerBlock = _rewardPerblock;
         MASTERCHEF_V2 = _MASTERCHEF_V2;
         PARENT = _PARENT;
 
@@ -112,7 +112,7 @@ contract ChildRewarder is IRewarder, Ownable, ReentrancyGuard {
     /// @notice Sets the reward per block to be distributed. Can only be called by the owner.
     /// @param _rewardPerblock The amount of token to be distributed per block.
     function setRewardPerblock(uint _rewardPerblock) public onlyOwner {
-        rewardPerblock = _rewardPerblock;
+        rewardPerBlock = _rewardPerblock;
         emit LogRewardPerblock(_rewardPerblock);
     }
 
@@ -166,7 +166,7 @@ contract ChildRewarder is IRewarder, Ownable, ReentrancyGuard {
 
         if (block.timestamp > pool.lastRewardTime && lpSupply != 0) {
             uint time = block.timestamp - pool.lastRewardTime;
-            uint reward = totalAllocPoint == 0 ? 0 : (time * rewardPerblock * pool.allocPoint / totalAllocPoint);
+            uint reward = totalAllocPoint == 0 ? 0 : (time * rewardPerBlock * pool.allocPoint / totalAllocPoint);
             accRewardPerShare = accRewardPerShare + (reward * ACC_TOKEN_PRECISION / lpSupply);
         }
         pending = (user.amount * accRewardPerShare / ACC_TOKEN_PRECISION) - user.rewardDebt;
@@ -190,7 +190,7 @@ contract ChildRewarder is IRewarder, Ownable, ReentrancyGuard {
 
             if (lpSupply > 0) {
                 uint time = block.timestamp - pool.lastRewardTime;
-                uint reward = totalAllocPoint == 0 ? 0 : (time * rewardPerblock * pool.allocPoint / totalAllocPoint);
+                uint reward = totalAllocPoint == 0 ? 0 : (time * rewardPerBlock * pool.allocPoint / totalAllocPoint);
                 pool.accRewardPerShare = pool.accRewardPerShare + uint128(reward * ACC_TOKEN_PRECISION / lpSupply);
             }
             pool.lastRewardTime = uint64(block.timestamp);
