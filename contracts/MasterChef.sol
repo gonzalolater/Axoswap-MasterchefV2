@@ -5,7 +5,7 @@ import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
-import "./Axolotl.sol";
+import "./Axoswap.sol";
  
 contract MasterChef is Ownable {
     using SafeMath for uint256;
@@ -25,7 +25,7 @@ contract MasterChef is Ownable {
         uint256 accAXOPerShare; // Accumulated AXOs per share, times 1e12. See below.
     }
 
-    Axolotl public axo;
+    Axoswap public axo;
 
      address public devaddr;
     // Block number when bonus Axo period ends.
@@ -49,7 +49,7 @@ contract MasterChef is Ownable {
     event EmergencyWithdraw(address indexed user, uint256 indexed pid, uint256 amount);
 
     constructor(
-        Axolotl _axo,
+        Axoswap _axo,
         address _devaddr,
         uint256 _axoPerBlock,
         uint256 _startBlock,

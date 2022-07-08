@@ -12,8 +12,8 @@ import { HardhatUserConfig } from "hardhat/types"
 import "hardhat-gas-reporter"
 
 const MASTER_PID = 25
-const MCV1 = "0x0d6995072186C54AaCea93f112B86C125B6Ee6F3"
-const MCV2 = "0xFfDCb4e461130889908444221a8714bbF04D18cA"
+const MCV1 = "0xC5C24B76de65808eD1c17E411c6C5cfC78FA1A98"
+const MCV2 = "0xb80d90DA1231C84DD1327CcaFD9b750e03a0264E"
 
 task("addpool", "Adds pool to MCv2").addParam("allocPoint", "Amount of points to allocate to the new pool", undefined, types.int).addParam("lpToken", "Address of the LP tokens for the farm").addOptionalParam("update", "true if massUpdateAllPools should be called", false, types.boolean).addParam("sleep", "Time in seconds to sleep between adding and setting up the pool", undefined, types.int).setAction(async (taskArgs, hre) => {
     const wait = (milliseconds) => {
@@ -83,10 +83,11 @@ const config: HardhatUserConfig = {
   },
   networks: {
     polygon: {
-      url: "",
+      url: process.env.INFURA_URL,
       accounts: getAccounts("polygon"),
       chainId: 137,
       gasPrice: 45000000000,
+
     },
   },
   spdxLicenseIdentifier: {
