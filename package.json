@@ -1,8 +1,8 @@
 {
-  "name": "spookyswap-chefv2",
+  "name": "axoswap-chefv2",
   "version": "1.0.0",
   "license": "MIT",
-  "description": "Contracts for all things spooky chefv2 related",
+  "description": "Contracts for axoswap masterchefv2 reward system",
   "files": [
     "abi",
     "artifacts",
@@ -20,8 +20,7 @@
     "test": "npx hardhat test --verbose",
     "deploy": "npx hardhat --network polygon ",
     "deploy:mumbai": "npx hardhat --network mumbai deploy",
-    "deploy:localhost": "npx hardhat --network localhost deploy",
-    "addpool": "npx hardhat --network polygon run scripts/acelab_addpool.ts"
+    "deploy:localhost": "npx hardhat --network localhost deploy"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",

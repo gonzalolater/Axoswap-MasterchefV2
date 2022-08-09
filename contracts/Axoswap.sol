@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 
 contract Axoswap is ERC20, ERC20Burnable, Pausable, Ownable, ERC20Permit {
     constructor() ERC20("Axoswap Token", "AXO") ERC20Permit("Axoswap Token") {
-        _mint(msg.sender, 45000000 * 10 ** decimals());
+        _mint(msg.sender, 75000000 * 10 ** decimals());
     }
 
     function pause() public onlyOwner {
