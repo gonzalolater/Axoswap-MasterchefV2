@@ -13,7 +13,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/gonzalolater/Axoswap-MasterchefV2"
   },
   "scripts": {
     "compile": "npx hardhat compile",
@@ -35,7 +35,7 @@
     "dotenv": "^10.0.0",
     "ethereum-waffle": "^3.0.0",
     "ethers": "^5.4.2",
-    "hardhat": "^2.5.0",
+    "hardhat": "^2.12.6",
     "hardhat-abi-exporter": "^2.2.1",
     "hardhat-spdx-license-identifier": "^2.0.3",
     "solidity-coverage": "^0.7.16",
