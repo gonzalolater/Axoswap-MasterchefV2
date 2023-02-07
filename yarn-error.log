@@ -42,7 +42,7 @@ npm manifest:
     ],
     "repository": {
       "type": "git",
-      "url": "git+https://github.com/spookyswap/spookyswap-chefv2.git"
+      "url": "git+https://github.com/gonzalolater/Axoswap-MasterchefV2"
     },
     "scripts": {
       "compile": "npx hardhat compile",
