@@ -18,7 +18,8 @@
   "scripts": {
     "compile": "npx hardhat compile",
     "test": "npx hardhat test --verbose",
-    "deploy": "npx hardhat --network goerli ",
+    "deploy": "npx hardhat --network goerli",
+    "deploy:polygon": "npx hardhat --network polygon",
     "deploy:mumbai": "npx hardhat --network mumbai deploy",
     "deploy:localhost": "npx hardhat --network localhost deploy"
   },
